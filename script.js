@@ -11,7 +11,7 @@ const sentences = [
   "Dank voor uw tijd."
 ];
 
-// Dropdown vullen met templates
+// Dropdown vullen
 const templateSelect = document.getElementById("template-select");
 templates.forEach((t, index) => {
   const option = document.createElement("option");
@@ -20,23 +20,41 @@ templates.forEach((t, index) => {
   templateSelect.appendChild(option);
 });
 
-// Tekstveld vullen bij keuze template
+// Tekstveld vullen bij template selectie
 const emailContent = document.getElementById("email-content");
 templateSelect.addEventListener("change", () => {
   const t = templates[templateSelect.value];
   emailContent.value = t.content;
 });
 
-// Veelgebruikte zinnen lijst
+// Veelgebruikte zinnen toevoegen met drag-and-drop
 const sentenceList = document.getElementById("sentence-list");
-sentences.forEach(s => {
+sentences.forEach((s, i) => {
   const li = document.createElement("li");
   li.textContent = s;
-  li.addEventListener("click", () => {
-    emailContent.value += "\n" + s;
-  });
+  li.setAttribute("draggable", true);
+  li.setAttribute("id", "sentence-" + i);
+
+  li.addEventListener("dragstart", drag);
+
   sentenceList.appendChild(li);
 });
+
+// Drag-and-drop functies
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  const data = ev.dataTransfer.getData("text");
+  const text = document.getElementById(data).textContent;
+  emailContent.value += "\n" + text;
+}
 
 // Kopieer naar clipboard
 document.getElementById("copy-button").addEventListener("click", () => {
@@ -44,3 +62,4 @@ document.getElementById("copy-button").addEventListener("click", () => {
   navigator.clipboard.writeText(emailContent.value);
   alert("Gekopieerd naar clipboard!");
 });
+
